@@ -138,7 +138,7 @@ class TSP_Env(gym.Env):
         )
 
         # Action space, UP, DOWN, LEFT, RIGHT
-        self.action_space = spaces.Discrete(4)
+        self.action_space = spaces.Discrete(8)
 
     def reset(self):
         
@@ -343,12 +343,14 @@ class TSP_Env(gym.Env):
 
         info = {}
         #self.everything()
+        
         return self.__compute_state(), reward, done, info
 
     def __play_action(self, action):
         #save the previous pose 
         agt_pre_xy= (self.agt_x,self.agt_y)
         #look for border 
+
         if action == 0:  # UP
             self.agt_y = min(self.map_max_y, self.agt_y + 1)
         elif action == 1:  # DOWN
@@ -357,6 +359,23 @@ class TSP_Env(gym.Env):
             self.agt_x = max(self.map_min_x, self.agt_x - 1)
         elif action == 3:  # RIGHT
             self.agt_x = min(self.map_max_x, self.agt_x + 1)
+
+        elif action == 4:  # UP LEFT
+            self.agt_y = min(self.map_max_y, self.agt_y + 1)
+            self.agt_x = max(self.map_min_x, self.agt_x - 1)
+
+        elif action == 5:  #  UP RIGHT
+            self.agt_y = min(self.map_max_y, self.agt_y + 1)
+            self.agt_x = min(self.map_max_x, self.agt_x + 1)
+
+        elif action == 6:  # DOWN LEFT
+            self.agt_y = max(self.map_min_y, self.agt_y - 1)
+            self.agt_x = max(self.map_min_x, self.agt_x - 1)
+
+        elif action == 7:  # DOWN RIGHT
+            self.agt_y = max(self.map_min_y, self.agt_y - 1)
+            self.agt_x = min(self.map_max_x, self.agt_x + 1)
+
         else:
             raise Exception("action: {action} is invalid")
         #save the new pose 
@@ -450,7 +469,7 @@ tune_config = {
     "env_config": {
         "map_quad":(10,10),
         "n_orders":8,   
-        "max_time":50,
+        "max_time":500,
         "randomized_orders":True,
     },
     "framework": "torch",  # ou "tf" pour TensorFlow
