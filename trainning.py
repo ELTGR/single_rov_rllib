@@ -169,8 +169,11 @@ class TSP_Env(gym.Env):
         self.obs_y = [y for x, y in self.exclusion_square]
         
         return self.__compute_state()
+ 
     def place_exclusion (self) :
         self.place_casse()
+        #self.place_casse()
+        #self.place_casse()
         #if self.map_max_x == 1 :
             
         # else :
@@ -394,10 +397,10 @@ class TSP_Env(gym.Env):
             + self.obs_x
             + self.obs_y
         )
-        print(self.o_x,self.o_y)
-        print(self.order_distances, self.obs_x, self.obs_y)
-        print(observation)
-        print(len(observation))
+        #print(self.o_x,self.o_y)
+        #print(self.order_distances, self.obs_x, self.obs_y)
+        #print(observation)
+        #print(len(observation))
         return observation
     def __receive_order(self):
 
@@ -436,13 +439,13 @@ tune_config = {
     #env_config est la configuration de notre environnement : nombre d'agent, d'objectif, ect
     "env_config": {
         "map_quad":(4,4),
-        "n_orders":4,   
+        "n_orders":8,   
         "max_time":50,
         "randomized_orders":True,
     },
     "framework": "torch",  # ou "tf" pour TensorFlow
     #nombre d'agent qui seront entrainer en parallèle
-    "num_workers": 1,
+    "num_workers": 4,
     "num_learner_workers" : 0,
 
     #Pour entrainer avec des GPU mettre "num_cpus" a 1 puis décomemnter la ligne " "num_gpus_per_worker": 1," et remplacer 2 pour le nombre de gpu voulu par workers
@@ -450,7 +453,7 @@ tune_config = {
     #"num_gpus_per_worker": 2,
 
     #commenter cette ligne si num_gpus = 1 
-    "num_cpus_per_worker": 10,
+    "num_cpus_per_worker": 5,
 
     #si 2 worker et 2 cpu ou gpu par worker alors 4 cpu ou gpu seront utilisé
 
