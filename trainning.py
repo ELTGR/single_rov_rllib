@@ -6,7 +6,8 @@ import ray
 from gymnasium import spaces
 import numpy as np
 from ray import tune
-
+import random
+import math
 class TSP_Env(gym.Env):
 
     def __init__(self,config):
@@ -46,6 +47,8 @@ class TSP_Env(gym.Env):
         self.map_max_x = +map_quad[0]
         self.map_min_y = -map_quad[1]
         self.map_max_y = +map_quad[1]
+        
+        
 
         # agent x,
         agt_x_min = [self.map_min_x]
@@ -59,16 +62,16 @@ class TSP_Env(gym.Env):
         #     coeff = 1 
         # else :
         #     coeff=(self.map_max_x-1)*7
-        coeff=1
-        obstacle_x_min = [self.map_min_x] * coeff
-        obstacle_x_max = [self.map_max_x] * coeff
+        coeff=14
+        obstacle_x_min = [-math.inf] * coeff
+        obstacle_x_max = [math.inf] * coeff
         # obstacle y,
-        obstacle_y_min = [self.map_min_y] * coeff
-        obstacle_y_max = [self.map_max_y] * coeff
+        obstacle_y_min = [-math.inf] * coeff
+        obstacle_y_max = [math.inf] * coeff
 
         #agent battery,
-        agt_battery_min = [0]
-        agt_battery_max = [100]
+        agt_battery_min = [-200]
+        agt_battery_max = [200]
         # n_orders for x positions of orders,
         o_x_min = [self.map_min_x for i in range(n_orders)]
         o_x_max = [self.map_max_x for i in range(n_orders)]
@@ -143,8 +146,8 @@ class TSP_Env(gym.Env):
         self.restaurant_y = 0
         self.agt_x = self.restaurant_x
         self.agt_y = self.restaurant_y
-        self.agt_battery = 100
-        self.battery_eff = 1
+        self.agt_battery = 200
+        self.battery_eff = random.randint(1,15)
         self.square_used=[(0,0)]
         self.exclusion_square=[]
         if self.randomized_orders:
@@ -171,6 +174,12 @@ class TSP_Env(gym.Env):
         return self.__compute_state()
  
     def place_exclusion (self) :
+       
+        self.place_carrer()
+        self.place_carrer()
+        self.place_horiz()
+        self.place_horiz()
+        self.place_casse()
         self.place_casse()
         #self.place_casse()
         #self.place_casse()
@@ -178,8 +187,7 @@ class TSP_Env(gym.Env):
             
         # else :
            
-        #     self.place_carrer()
-        #     self.place_horiz()
+
         #     self.place_casse()
 
     def place_carrer(self):
@@ -207,7 +215,7 @@ class TSP_Env(gym.Env):
 
                 if i >= 10000 :
                     carrer=False
-                    placement=[(7,7)]
+                    placement=[(10000,10000)]
 
         else : 
              obstacle_x=1
@@ -220,7 +228,7 @@ class TSP_Env(gym.Env):
                          (obstacle_x-1,obstacle_y-2),(obstacle_x,obstacle_y-2),(obstacle_x+1,obstacle_y-2),(obstacle_x+2,obstacle_y-2)]
         self.square_used+= placement
         self.square_used+=square_hitobx
-        self.exclusion_square = placement       
+        self.exclusion_square += placement       
                
     def place_horiz(self):
 
@@ -245,7 +253,7 @@ class TSP_Env(gym.Env):
                 
                 if i >= 10000 :
                     horiz=False
-                    placement=[(7,7)]
+                    placement=[(10000,10000)]
 
                 if flag :
                     horiz=False
@@ -287,7 +295,7 @@ class TSP_Env(gym.Env):
 
                 if i >= 10000 :
                     casse=False
-                    placement=[(7,7)]
+                    placement=[(10000,10000)]
 
                 if flag :
                     casse=False
@@ -300,6 +308,8 @@ class TSP_Env(gym.Env):
                          (obstacle_x-1,obstacle_y-1),(obstacle_x,obstacle_y-1),(obstacle_x+1,obstacle_y-1)]
         self.square_used+= square_hitbox
         self.square_used+= placement
+
+
         self.exclusion_square += placement
 
     def create_grid(self):
@@ -438,7 +448,7 @@ tune_config = {
     "env": TSP_Env,
     #env_config est la configuration de notre environnement : nombre d'agent, d'objectif, ect
     "env_config": {
-        "map_quad":(4,4),
+        "map_quad":(10,10),
         "n_orders":8,   
         "max_time":50,
         "randomized_orders":True,
